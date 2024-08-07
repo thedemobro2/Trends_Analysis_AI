@@ -32,6 +32,23 @@ books_read_over_time = read_books['Date Read'].dt.year.value_counts().sort_index
 read_books['Number of Pages'] = read_books['Number of Pages'].dropna().astype(int)
 pages_read_over_time = read_books.groupby(read_books['Date Read'].dt.year)['Number of Pages'].sum().sort_index()
 
+# Average rating for books in the "to-read" list
+to_read_books = df[df['Exclusive Shelf'] == 'to-read']
+average_rating_to_read = to_read_books['Average Rating'].mean()
+
+# Preferred binding type among read books
+read_books = df[df['Exclusive Shelf'] == 'read']
+preferred_binding = read_books['Binding'].value_counts().idxmax()
+
+# Most common publication year among read books
+most_common_publication_year = read_books['Year Published'].mode().iloc[0]
+
+# Time a book sits in "to-read" before it goes to "read"
+read_books['Date Added'] = pd.to_datetime(read_books['Date Added'], errors='coerce')
+read_books['Date Read'] = pd.to_datetime(read_books['Date Read'], errors='coerce')
+read_books['Time in To-Read'] = (read_books['Date Read'] - read_books['Date Added']).dt.days
+average_time_in_to_read = read_books['Time in To-Read'].mean()
+
 {
     "Number of Books Read": num_books_read,
     "Average Rating Given": average_rating_given,
@@ -42,4 +59,8 @@ pages_read_over_time = read_books.groupby(read_books['Date Read'].dt.year)['Numb
     "Average Rating by Author": average_rating_by_author,
     "Books Read Over Time": books_read_over_time,
     "Pages Read Over Time": pages_read_over_time
+    "Average Rating of To-Read Books": average_rating_to_read,
+    "Preferred Binding Type": preferred_binding,
+    "Most Common Publication Year": most_common_publication_year,
+    "Average Time in To-Read": average_time_in_to_read
 }
